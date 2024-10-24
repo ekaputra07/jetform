@@ -14,8 +14,9 @@ defmodule AppWeb.AdminLive.Product.Edit do
       customer_email: "john@example.com",
       customer_phone: "08123456789",
       status: :free,
-      invoice_number: "INV-123",
+      invoice_number: "INV-123"
     }
+
     thanks_config = Products.ThanksPageConfig.get_or_default(product)
     brand_info = App.Users.get_brand_info(product.user)
 
@@ -33,14 +34,6 @@ defmodule AppWeb.AdminLive.Product.Edit do
 
   @impl true
   def handle_event("validate", %{"product" => product_params}, socket) do
-    # set details changes
-    # TODO: handle details on client side
-    product_params =
-      case Map.get(socket.assigns.changeset.changes, :details) do
-        nil -> product_params
-        details -> Map.put(product_params, "details", details)
-      end
-
     changeset =
       socket.assigns.product
       |> Products.change_product(product_params)
@@ -51,14 +44,6 @@ defmodule AppWeb.AdminLive.Product.Edit do
 
   @impl true
   def handle_event("save", %{"product" => product_params}, socket) do
-    # set details changes
-    # TODO: handle details on client side
-    product_params =
-      case Map.get(socket.assigns.changeset.changes, :details) do
-        nil -> product_params
-        details -> Map.put(product_params, "details", details)
-      end
-
     socket =
       case Products.update_product(socket.assigns.product, product_params) do
         {:ok, product} ->
@@ -77,43 +62,27 @@ defmodule AppWeb.AdminLive.Product.Edit do
   end
 
   @impl true
-  def handle_event("add_detail", _params, socket) do
-    {:noreply,
-     assign(
-       socket,
-       :changeset,
-       Products.add_detail(socket.assigns.product, socket.assigns.changeset)
-     )}
+  def handle_event("add_attribute", _params, socket) do
+    socket =
+      update(socket, :changeset, fn changeset ->
+        attributes = Ecto.Changeset.get_field(changeset, :attributes, [])
+        Ecto.Changeset.put_embed(changeset, :attributes, attributes ++ [%{}])
+      end)
+
+    {:noreply, socket}
   end
 
   @impl true
-  def handle_event("delete_detail", detail, socket) do
-    {:noreply,
-     assign(
-       socket,
-       :changeset,
-       Products.delete_detail(socket.assigns.product, socket.assigns.changeset, detail)
-     )}
-  end
+  def handle_event("delete_attribute", %{"index" => index}, socket) do
+    index = String.to_integer(index)
 
-  @impl true
-  def handle_event(
-        "update_detail",
-        %{"_target" => [target]} = params,
-        socket
-      ) do
-    ["detail", type, id] = String.split(target, "_")
+    socket =
+      update(socket, :changeset, fn changeset ->
+        attributes = Ecto.Changeset.get_field(changeset, :attributes, [])
+        Ecto.Changeset.put_embed(changeset, :attributes, List.delete_at(attributes, index))
+      end)
 
-    changeset =
-      Products.update_detail(
-        socket.assigns.product,
-        socket.assigns.changeset,
-        id,
-        type,
-        params[target]
-      )
-
-    {:noreply, assign(socket, :changeset, changeset)}
+    {:noreply, socket}
   end
 
   @impl true
@@ -151,7 +120,6 @@ defmodule AppWeb.AdminLive.Product.Edit do
   def handle_info({:thanks_config_updated, config}, socket) do
     {:noreply, assign(socket, :thanks_config, config)}
   end
-
 
   defp update_preview(socket) do
     product = socket.assigns.product

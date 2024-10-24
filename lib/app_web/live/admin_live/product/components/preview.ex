@@ -142,25 +142,25 @@ defmodule AppWeb.AdminLive.Product.Components.Preview do
           <%= raw(@product.description) %>
         </div>
 
-        <%!-- details table --%>
-        <div :if={Products.has_details?(@product)} class="relative overflow-x-auto rounded-md">
+        <%!-- attrbutes table --%>
+        <div :if={Products.has_attributes?(@product)} class="relative overflow-x-auto rounded-md">
           <table class="w-full text-sm text-left rtl:text-right text-gray-700 dark:text-gray-700">
             <tbody>
               <tr
-                :for={{item, index} <- Enum.with_index(@product.details["items"])}
+                :for={{item, index} <- Enum.with_index(@product.attributes)}
                 class={if Integer.is_even(index), do: "bg-primary-100", else: "bg-primary-50"}
               >
                 <td
                   scope="row"
                   class="p-2 font-medium text-gray-700 whitespace-nowrap dark:text-gray-700"
                 >
-                  <%= item["key"] %>
+                  <%= item.key %>
                 </td>
                 <td
                   scope="row"
                   class="p-2 font-medium text-gray-700 whitespace-nowrap dark:text-gray-700"
                 >
-                  <.icon name="hero-chevron-right me-2 w-3 h-3" /> <%= item["value"] %>
+                  <.icon name="hero-chevron-right me-2 w-3 h-3" /> <%= item.value %>
                 </td>
               </tr>
             </tbody>
@@ -244,11 +244,7 @@ defmodule AppWeb.AdminLive.Product.Components.Preview do
                 type="submit"
                 class="mt-5 w-full items-center justify-center rounded-md bg-primary-600 p-4 text-lg font-semibold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-primary-700"
               >
-                <%= if Products.cta_custom?(@product.cta) do %>
-                  <%= @product.cta_text %>
-                <% else %>
-                  <%= Products.cta_text(@product.cta) %>
-                <% end %>
+                <%= @product.cta %>
               </button>
             </div>
           </:actions>

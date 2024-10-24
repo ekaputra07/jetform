@@ -52,7 +52,7 @@ defmodule AppWeb.AdminLive.Product.Components.Settings do
             <trix-editor input="thanks_page_config_message" class="trix-content"></trix-editor>
           </div>
 
-          <div class="flex" :if={@form[:type].value == "message"}>
+          <div :if={@form[:type].value == "message"} class="flex">
             <div class="flex items-center h-5">
               <.input field={@form[:show_brand_logo]} type="checkbox" />
             </div>
@@ -60,13 +60,16 @@ defmodule AppWeb.AdminLive.Product.Components.Settings do
               <label for="helper-checkbox" class="font-medium text-gray-900 dark:text-gray-300">
                 Tampilkan logo
               </label>
-              <p id="helper-checkbox-text" class="text-xs font-normal text-gray-500 dark:text-gray-300">
+              <p
+                id="helper-checkbox-text"
+                class="text-xs font-normal text-gray-500 dark:text-gray-300"
+              >
                 Silahkan upload logo Anda di pengaturan akun sebelum bisa menggunakan opsi ini.
               </p>
             </div>
           </div>
 
-          <div class="flex" :if={@form[:type].value == "message"}>
+          <div :if={@form[:type].value == "message"} class="flex">
             <div class="flex items-center h-5">
               <.input field={@form[:message_left_aligned]} type="checkbox" />
             </div>
@@ -74,7 +77,10 @@ defmodule AppWeb.AdminLive.Product.Components.Settings do
               <label for="helper-checkbox" class="font-medium text-gray-900 dark:text-gray-300">
                 Format pesan rata kiri
               </label>
-              <p id="helper-checkbox-text" class="text-xs font-normal text-gray-500 dark:text-gray-300">
+              <p
+                id="helper-checkbox-text"
+                class="text-xs font-normal text-gray-500 dark:text-gray-300"
+              >
                 Disarankan apabila pesan Anda lumayan panjang dan terdiri dari beberapa paragraf (agar mudah dibaca).
               </p>
             </div>

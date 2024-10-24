@@ -134,9 +134,9 @@
     </div>
 
     <div class="border border-gray-300 rounded-md shadow-sm bg-slate-100 overflow-hidden">
-    <div class="bg-gray-50 border-b border-gray-300 p-4 text-sm font-medium text-center text-slate-500">
-    <%= if @tab == "settings", do: "Setelah Pembayaran", else: "Preview Produk" %>
-    </div>
+      <div class="bg-gray-50 border-b border-gray-300 p-4 text-sm font-medium text-center text-slate-500">
+        <%= if @tab == "settings", do: "Setelah Pembayaran", else: "Preview Produk" %>
+      </div>
       <div>
         <.live_component
           :if={@tab != "settings"}
@@ -147,9 +147,9 @@
         />
 
         <.thanks_message
-          :if={@tab == "settings"} 
-          config={@thanks_config} 
-          order={@dummy_order} 
+          :if={@tab == "settings"}
+          config={@thanks_config}
+          order={@dummy_order}
           brand_info={@brand_info}
         />
       </div>

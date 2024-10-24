@@ -5,10 +5,10 @@ defmodule App.Products do
 
   # --------------- PRODUCT ---------------
   defdelegate price_type_options, to: Product
-  defdelegate cta_options, to: Product
-  defdelegate cta_text(cta), to: Product
-  defdelegate cta_custom?(cta), to: Product
-  defdelegate has_details?(product), to: Product
+
+  def has_attributes?(%Product{attributes: nil}), do: false
+  def has_attributes?(%Product{attributes: []}), do: false
+  def has_attributes?(%Product{}), do: true
 
   def list_products_by_user!(user, query) do
     from(p in Product,
@@ -101,60 +101,6 @@ defmodule App.Products do
           :flexible -> "Mulai " <> formatted_price
         end
     end
-  end
-
-  def add_detail(product, %{changes: changes}) do
-    # try to get details from changes, if not, get from product
-    details =
-      case Map.get(changes, :details) do
-        nil -> product.details
-        details -> details
-      end
-
-    id = DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string()
-
-    details =
-      Map.put(details, "items", details["items"] ++ [%{"id" => id, "key" => "", "value" => ""}])
-
-    change_product(product, Map.put(changes, :details, details))
-  end
-
-  def delete_detail(product, %{changes: changes}, detail) do
-    # try to get details from changes, if not, get from product
-    details =
-      case Map.get(changes, :details) do
-        nil -> product.details
-        details -> details
-      end
-
-    items =
-      Enum.filter(details["items"], fn item ->
-        item["id"] != detail["id"]
-      end)
-
-    details = Map.put(details, "items", items)
-    change_product(product, Map.put(changes, :details, details))
-  end
-
-  def update_detail(product, %{changes: changes}, id, which, value) do
-    # try to get details from changes, if not, get from product
-    details =
-      case Map.get(changes, :details) do
-        nil -> product.details
-        details -> details
-      end
-
-    items =
-      Enum.map(details["items"], fn item ->
-        if item["id"] == id do
-          Map.put(item, which, value)
-        else
-          item
-        end
-      end)
-
-    details = Map.put(details, "items", items)
-    change_product(product, Map.put(changes, :details, details))
   end
 
   # --------------- VARIANT ---------------

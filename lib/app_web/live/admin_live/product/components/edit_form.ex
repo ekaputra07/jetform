@@ -72,26 +72,7 @@ defmodule AppWeb.AdminLive.Product.Components.EditForm do
               </div>
             </:help>
           </.input>
-          <.input
-            field={f[:cta]}
-            type="select"
-            label="Call To Action (CTA)"
-            options={App.Products.cta_options()}
-            required
-          />
-          <.input
-            :if={show_cta_text_input?(@changeset) == false}
-            field={f[:cta_text]}
-            type="text"
-            rest_class="hidden"
-          />
-          <.input
-            :if={show_cta_text_input?(@changeset)}
-            field={f[:cta_text]}
-            type="text"
-            placeholder="Custom CTA..."
-            required
-          />
+          <.input field={f[:cta]} type="text" label="Call To Action (CTA)" required />
         </div>
 
         <hr />
@@ -100,17 +81,17 @@ defmodule AppWeb.AdminLive.Product.Components.EditForm do
             <p class="font-normal flex items-center">
               <.icon name="hero-newspaper me-1" />Deskripsi produk
             </p>
-            <p class="pl-6 mt-1 text-xs text-gray-500">
-              Detail bisa digunakan untuk menampilkan spesifikasi produk dalam format tabel.
-            </p>
           </div>
 
           <div id="trix-editor-product-description" phx-update="ignore">
             <.input field={f[:description]} type="hidden" phx-hook="InitTrix" />
             <trix-editor input="product_description" class="trix-content"></trix-editor>
           </div>
+        </div>
 
-          <.details_input details={f[:details]} label="Detail" />
+        <hr />
+        <div class="p-4 md:p-8 bg-white dark:bg-gray-800 space-y-6">
+          <.attributes_input field={f[:attributes]} />
         </div>
 
         <hr />
@@ -199,52 +180,39 @@ defmodule AppWeb.AdminLive.Product.Components.EditForm do
     """
   end
 
-  attr :label, :string, default: "Details"
-  attr :details, :map, required: true
-  attr :on_add, :string, default: "add_detail"
-  attr :on_change, :string, default: "update_detail"
-  attr :on_delete, :string, default: "delete_detail"
+  attr :field, :map, required: true
+  attr :on_add, :string, default: "add_attribute"
+  attr :on_delete, :string, default: "delete_attribute"
 
-  def details_input(assigns) do
+  def attributes_input(assigns) do
     ~H"""
-    <div phx-feedback-for="details">
-      <.label><%= @label %></.label>
-      <div
-        :for={%{"id" => id, "key" => key, "value" => value} = detail <- @details.value["items"]}
-        class="flex gap-2 items-center"
-      >
-        <.input
-          name={"detail_key_"  <> id}
-          type="text"
-          placeholder="Nama detail"
-          value={key}
-          wrapper_class="flex-1"
-          phx-change={@on_change}
-        />
-        <span class="flex-none inline-flex">=</span>
-        <.input
-          name={"detail_value_"  <> id}
-          type="text"
-          placeholder="Value detail"
-          value={value}
-          wrapper_class="flex-1"
-          phx-change={@on_change}
-        />
-        <.button
-          phx-click={JS.push(@on_delete, value: detail)}
-          type="button"
-          class="self-center flex-none text-red-600 hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-md text-sm px-3 py-2 mt-2 text-center dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-500 dark:focus:ring-red-600"
-        >
-          <.icon name="hero-trash w-4 h-4" />
-        </.button>
-      </div>
+    <div phx-feedback-for="attributes">
+      <.label>Atribut Tambahan</.label>
+      <p class="mt-1 mb-2 text-xs text-gray-500">
+        Bisa digunakan untuk menampilkan spesifikasi produk dalam format tabel.
+      </p>
+      <.inputs_for :let={attr} field={@field}>
+        <div class="flex gap-2 items-center">
+          <.input field={attr[:key]} type="text" placeholder="Nama atribut" wrapper_class="flex-1" />
+          <span class="flex-none inline-flex">=</span>
+          <.input field={attr[:value]} type="text" placeholder="Nilai atribut" wrapper_class="flex-1" />
+          <.button
+            phx-click={@on_delete}
+            phx-value-index={attr.index}
+            type="button"
+            class="self-center flex-none text-red-600 hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-md text-sm px-3 py-2 mt-2 text-center dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-500 dark:focus:ring-red-600"
+          >
+            <.icon name="hero-trash w-4 h-4" />
+          </.button>
+        </div>
+      </.inputs_for>
 
       <.button
         phx-click={@on_add}
         type="button"
         class="mt-2 w-full bg-primary-600 hover:bg-primary-700 text-white border focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-3 text-center me-2 mb-2"
       >
-        <.icon name="hero-plus-small w-4 h-4" />Tambah detail
+        <.icon name="hero-plus-small w-4 h-4" />Tambah Atribut
       </.button>
     </div>
     """
@@ -252,9 +220,5 @@ defmodule AppWeb.AdminLive.Product.Components.EditForm do
 
   defp show_price_input?(changeset) do
     Map.get(changeset.changes, :price_type, changeset.data.price_type) != :free
-  end
-
-  defp show_cta_text_input?(changeset) do
-    Map.get(changeset.changes, :cta, changeset.data.cta) == :custom
   end
 end

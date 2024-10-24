@@ -386,7 +386,10 @@ defmodule AppWeb.CustomComponents do
           <span><%= @config.title %></span>
         </p>
 
-        <div class={["text-lg text-slate-600 mx-auto max-w-lg message", (if @config.message_left_aligned, do: "text-left", else: "text-center")]}>
+        <div class={[
+          "text-lg text-slate-600 mx-auto max-w-lg message",
+          if(@config.message_left_aligned, do: "text-left", else: "text-center")
+        ]}>
           <%= raw(@config.message) %>
         </div>
 
